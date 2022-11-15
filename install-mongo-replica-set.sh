@@ -136,7 +136,7 @@ docker run -d --restart always \
   --mount src=$PWD/config/mongodb-keyfile,target=/opt/keyfile/mongodb-keyfile,type=bind \
 	mongo --config /etc/mongoconfig/mongod.conf
 
-cmd_str="docker exec -i mongo1 /bin/bash -c 'mongosh --host $SYSTEM_IP --port $PORT1 < d_cmd.js; eval "$(exit 0)";'"
+cmd_str="docker exec --tty mongo1 /bin/bash -c 'mongosh --host $SYSTEM_IP --port $PORT1 < d_cmd.js; eval "$(exit 0)";'"
 eval $cmd_str
 
 ## Authorization
