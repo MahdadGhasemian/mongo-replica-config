@@ -17,14 +17,14 @@ then
 fi
 
 if [ "$EUID" -ne 0 ]
-  then echo "Please run as root user or run with sudo"
-  exit
+then echo "Please run as root user or run with sudo"
+    exit
 fi
 
 ## Check for docker
 docker --version
 if [ $? -ne 0 ]
-  then
+then
     curl -fsSL https://get.docker.com | sh
 fi
 
@@ -116,38 +116,38 @@ docker network create $DOCKER_NETWORK || true
 
 ## Run Docker containers
 docker run -d --restart always \
-	--name mongo1 \
-	-p $PORT1:27017 \
-  --network $DOCKER_NETWORK \
-  -e MONGO_INITDB_ROOT_USERNAME=$DATABASE_ADMIN_USERNAME \
-	-e MONGO_INITDB_ROOT_PASSWORD=$DATABASE_ADMIN_PASSWORD \
-  --mount src=$PWD/data/data1,target=/data/db,type=bind \
-  --mount src=$PWD/config/mongod.conf,target=/etc/mongoconfig/mongod.conf,type=bind \
-  --mount src=$PWD/config/mongodb-keyfile,target=/opt/keyfile/mongodb-keyfile,type=bind \
-  --mount src=$PWD/d_cmd.js,target=/d_cmd.js,type=bind \
-	mongo --config /etc/mongoconfig/mongod.conf
+--name mongo1 \
+-p $PORT1:27017 \
+--network $DOCKER_NETWORK \
+-e MONGO_INITDB_ROOT_USERNAME=$DATABASE_ADMIN_USERNAME \
+-e MONGO_INITDB_ROOT_PASSWORD=$DATABASE_ADMIN_PASSWORD \
+--mount src=$PWD/data/data1,target=/data/db,type=bind \
+--mount src=$PWD/config/mongod.conf,target=/etc/mongoconfig/mongod.conf,type=bind \
+--mount src=$PWD/config/mongodb-keyfile,target=/opt/keyfile/mongodb-keyfile,type=bind \
+--mount src=$PWD/d_cmd.js,target=/d_cmd.js,type=bind \
+mongo --config /etc/mongoconfig/mongod.conf
 
 docker run -d --restart always \
-	--name mongo2 \
-	-p $PORT2:27017 \
-  --network $DOCKER_NETWORK \
-  -e MONGO_INITDB_ROOT_USERNAME=$DATABASE_ADMIN_USERNAME \
-	-e MONGO_INITDB_ROOT_PASSWORD=$DATABASE_ADMIN_PASSWORD \
-  --mount src=$PWD/data/data2,target=/data/db,type=bind \
-  --mount src=$PWD/config/mongod.conf,target=/etc/mongoconfig/mongod.conf,type=bind \
-  --mount src=$PWD/config/mongodb-keyfile,target=/opt/keyfile/mongodb-keyfile,type=bind \
-	mongo --config /etc/mongoconfig/mongod.conf
+--name mongo2 \
+-p $PORT2:27017 \
+--network $DOCKER_NETWORK \
+-e MONGO_INITDB_ROOT_USERNAME=$DATABASE_ADMIN_USERNAME \
+-e MONGO_INITDB_ROOT_PASSWORD=$DATABASE_ADMIN_PASSWORD \
+--mount src=$PWD/data/data2,target=/data/db,type=bind \
+--mount src=$PWD/config/mongod.conf,target=/etc/mongoconfig/mongod.conf,type=bind \
+--mount src=$PWD/config/mongodb-keyfile,target=/opt/keyfile/mongodb-keyfile,type=bind \
+mongo --config /etc/mongoconfig/mongod.conf
 
 docker run -d --restart always \
-	--name mongo3 \
-	-p $PORT3:27017 \
-  --network $DOCKER_NETWORK \
-  -e MONGO_INITDB_ROOT_USERNAME=$DATABASE_ADMIN_USERNAME \
-	-e MONGO_INITDB_ROOT_PASSWORD=$DATABASE_ADMIN_PASSWORD \
-  --mount src=$PWD/data/data3,target=/data/db,type=bind \
-  --mount src=$PWD/config/mongod.conf,target=/etc/mongoconfig/mongod.conf,type=bind \
-  --mount src=$PWD/config/mongodb-keyfile,target=/opt/keyfile/mongodb-keyfile,type=bind \
-	mongo --config /etc/mongoconfig/mongod.conf
+--name mongo3 \
+-p $PORT3:27017 \
+--network $DOCKER_NETWORK \
+-e MONGO_INITDB_ROOT_USERNAME=$DATABASE_ADMIN_USERNAME \
+-e MONGO_INITDB_ROOT_PASSWORD=$DATABASE_ADMIN_PASSWORD \
+--mount src=$PWD/data/data3,target=/data/db,type=bind \
+--mount src=$PWD/config/mongod.conf,target=/etc/mongoconfig/mongod.conf,type=bind \
+--mount src=$PWD/config/mongodb-keyfile,target=/opt/keyfile/mongodb-keyfile,type=bind \
+mongo --config /etc/mongoconfig/mongod.conf
 
 cmd_str="docker exec --tty mongo1 /bin/bash -c 'mongosh --host $SYSTEM_IP --port $PORT1 < d_cmd.js; eval "$(exit 0)";'"
 eval $cmd_str
