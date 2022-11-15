@@ -1,5 +1,17 @@
 #!/bin/bash
 
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root user or run with sudo"
+  exit
+fi
+
+## Check for docker
+docker --version
+if [ $? -ne 0 ]
+  then
+    curl -fsSL https://get.docker.com | sh
+fi
+
 ## PORTs
 PORT1=$1
 PORT2=$2
@@ -146,7 +158,7 @@ docker restart mongo1 mongo2 mongo3
 
 cat <<EOF > ./config.log
   Connection URL :
-  admin:
+  admin url:
     mongodb://$DATABASE_ADMIN_USERNAME:$DATABASE_ADMIN_PASSWORD@$SYSTEM_IP:$PORT1,$SYSTEM_IP:$PORT2,$SYSTEM_IP:$PORT3/test?replicaSet=rs0&readPreference=primary&ssl=false&authMechanism=DEFAULT&authSource=admin
   proxy:
     mongodb://$DATABASE_ADMIN_USERNAME:$DATABASE_ADMIN_PASSWORD@$SYSTEM_IP:$PORT1,$SYSTEM_IP:$PORT2,$SYSTEM_IP:$PORT3/test?replicaSet=rs0&readPreference=primary&ssl=false&authMechanism=DEFAULT&authSource=admin&proxyPort=20170&proxyHost=127.0.0.1
