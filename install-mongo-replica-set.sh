@@ -9,8 +9,16 @@ PORT3=$3
 DATABASE_ADMIN_USERNAME=$4
 DATABASE_ADMIN_PASSWORD=$5
 
+## System IP
+SYSTEM_IP=$6
+if [ -z $SYSTEM_IP ];
+then
+    SYSTEM_IP=$(curl -s "https://api.ipify.org/" )
+fi
+
+
 ## Docker network
-DOCKER_NETWORK=$6
+DOCKER_NETWORK=$7
 if [ -z $DOCKER_NETWORK ];
 then
     DOCKER_NETWORK="mongo-network-"$( tr -cd a-z </dev/urandom | head -c '4' ; echo '' )
@@ -94,9 +102,6 @@ EOF
 openssl rand -base64 756 > ./config/mongodb-keyfile
 chmod 600 ./config/mongodb-keyfile
 chown 999 ./config/mongodb-keyfile
-
-## GET IP
-SYSTEM_IP=$(curl -s "https://api.ipify.org/" )
 
 ## Write init cmd for database
 cat <<EOF > ./d_cmd.js
