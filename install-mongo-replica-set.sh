@@ -9,16 +9,22 @@ PORT3=$3
 DATABASE_ADMIN_USERNAME=$4
 DATABASE_ADMIN_PASSWORD=$5
 
+## Docker image mongo version
+MONGO_IMAGE=$6
+if [ -z $MONGO_IMAGE ];
+then
+    MONGO_IMAGE="5"
+fi
+
 ## System IP
-SYSTEM_IP=$6
+SYSTEM_IP=$7
 if [ -z $SYSTEM_IP ];
 then
     SYSTEM_IP=$(curl -s "https://api.ipify.org/" )
 fi
 
-
 ## Docker network
-DOCKER_NETWORK=$7
+DOCKER_NETWORK=$8
 if [ -z $DOCKER_NETWORK ];
 then
     DOCKER_NETWORK="mongo-network-"$( tr -cd a-z </dev/urandom | head -c '4' ; echo '' )
@@ -124,7 +130,7 @@ docker run -d --restart always \
 --mount src=$PWD/config/mongod.conf,target=/etc/mongoconfig/mongod.conf,type=bind \
 --mount src=$PWD/config/mongodb-keyfile,target=/opt/keyfile/mongodb-keyfile,type=bind \
 --mount src=$PWD/d_cmd.js,target=/d_cmd.js,type=bind \
-mongo --config /etc/mongoconfig/mongod.conf
+mongo:$MONGO_IMAGE --config /etc/mongoconfig/mongod.conf
 
 docker run -d --restart always \
 --name mongo2 \
@@ -135,7 +141,7 @@ docker run -d --restart always \
 --mount src=$PWD/data/data2,target=/data/db,type=bind \
 --mount src=$PWD/config/mongod.conf,target=/etc/mongoconfig/mongod.conf,type=bind \
 --mount src=$PWD/config/mongodb-keyfile,target=/opt/keyfile/mongodb-keyfile,type=bind \
-mongo --config /etc/mongoconfig/mongod.conf
+mongo:$MONGO_IMAGE --config /etc/mongoconfig/mongod.conf
 
 docker run -d --restart always \
 --name mongo3 \
@@ -146,7 +152,7 @@ docker run -d --restart always \
 --mount src=$PWD/data/data3,target=/data/db,type=bind \
 --mount src=$PWD/config/mongod.conf,target=/etc/mongoconfig/mongod.conf,type=bind \
 --mount src=$PWD/config/mongodb-keyfile,target=/opt/keyfile/mongodb-keyfile,type=bind \
-mongo --config /etc/mongoconfig/mongod.conf
+mongo:$MONGO_IMAGE --config /etc/mongoconfig/mongod.conf
 
 cmd_str="docker exec --tty mongo1 /bin/bash -c 'mongosh --host $SYSTEM_IP --port $PORT1 < d_cmd.js; eval "$(exit 0)";'"
 eval $cmd_str
